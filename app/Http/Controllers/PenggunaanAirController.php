@@ -8,6 +8,7 @@ use App\Models\Pengguna;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\PenggunaanAir;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -150,7 +151,7 @@ class PenggunaanAirController extends Controller
         if ($request->hasFile('foto_meter')) {
             // simpan ke storage/app/public/meteran
             $filename = time().'_'.$request->file('foto_meter')->getClientOriginalName();
-            $path = $request->file('foto_meter')->storeAs('meteran', $filename, 'public');
+            $path = $request->file('foto_meter')->storeAs('meteran', $filename, config('filesystems.default_public_disk'));
             $validated['foto_meter'] = $path;
         }
       
@@ -237,12 +238,12 @@ class PenggunaanAirController extends Controller
         // === Upload Foto Baru (jika ada) ===
         if ($request->hasFile('foto_meter')) {
             // hapus foto lama kalau ada
-            if ($penggunaan->foto_meter && Storage::disk('public')->exists($penggunaan->foto_meter)) {
-                Storage::disk('public')->delete($penggunaan->foto_meter);
+            if ($penggunaan->foto_meter && Storage::disk(config('filesystems.default_public_disk'))->exists($penggunaan->foto_meter)) {
+                Storage::disk(config('filesystems.default_public_disk'))->delete($penggunaan->foto_meter);
             }
 
             $filename = time().'_'.$request->file('foto_meter')->getClientOriginalName();
-            $path = $request->file('foto_meter')->storeAs('meteran', $filename, 'public');
+            $path = $request->file('foto_meter')->storeAs('meteran', $filename, config('filesystems.default_public_disk'));
             $validated['foto_meter'] = $path;
         }
 
