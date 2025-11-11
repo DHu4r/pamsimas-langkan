@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Models\Jurnal;
+use App\Models\Account;
 use App\Models\Pengguna;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\PenggunaanAir;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PenggunaanAirController extends Controller
@@ -278,8 +281,31 @@ class PenggunaanAirController extends Controller
         //check policy
         $this->authorize('delete', $penggunaanAir);
 
+        //Hitung nominal piutang
+        $tarif = config('tarif.harga_per_m3');
+        $nominal = $penggunaanAir->konsumsi * $tarif;
+
+        // Akun: Piutang (debit) vs Pendapatan (kredit)
+        $akunPiutang    = Account::where('kode', 'PTNPLG01')->firstOrFail();
+        $akunPendapatan = Account::where('kode', 'PNDPMS01')->firstOrFail();
+
+        //Buat jurnal pembalik
+        Jurnal::create([
+            'id' => Str::uuid(),
+            'tanggal' => now(),
+            'deskripsi' => "[PEMBALIK] Penggunaan air {$penggunaanAir->penggunas->nama}" .  " Periode {$penggunaanAir->periode_bulan}-{$penggunaanAir->periode_tahun}" . " dihapus oleh " . Auth::user()->nama,
+            'debit_account_id' => $akunPendapatan->id,
+            'kredit_account_id' => $akunPiutang->id,
+            'nominal' => $nominal
+        ]);
+
+        //Hapus foto meteran kalau ada
+        if($penggunaanAir->foto_meter && Storage::disk(config('filesystems.default_public_disk'))->exists($penggunaanAir->foto_meter)){
+            Storage::disk(config('filesystems.default_public_disk'))->delete($penggunaanAir->foto_meter);
+        }
+
         $penggunaanAir->delete();
 
-        return redirect()->route('penggunaan_air.index')->with('success', 'Data Penggunaan Air Dihapus!');
+        return redirect()->route('penggunaan_air.index')->with('success', 'Data Penggunaan Air Dihapus dan Jurnal Pembalik berhasil dibuat');
     }
 }

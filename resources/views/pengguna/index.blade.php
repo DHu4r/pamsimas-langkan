@@ -33,7 +33,9 @@
         </div>
         @endif
         <div>
-            <div class="flex w-full justify-between mb-4">
+            <div 
+            x-data="{ openFilter: {{ request('search') || request('role') || request('komplek') ? 'true' : 'false' }} }"
+            class="flex flex-col lg:flex-row w-full justify-between mb-4 space-x-1 space-y-1">
                 <div>
                     <button  @click="tambahPengguna()"
                         class="group flex px-4 py-2 rounded transition-all duration-300"
@@ -51,22 +53,35 @@
                             </svg>                      
                         <h3 class="font-semibold group-hover:text-slate-800" x-text="showForm ? 'Batal' : 'Tambah'"></h3>
                     </button>
-                </div> 
-                <form method="GET" action="{{ route('pengguna.index') }}" class="flex mb-4">
-                    @if(request('search') || request('role') || request('komplek'))
-                        <a href="{{ route('pengguna.index') }}"
-                            class="px-4 py-2 bg-gray-300 text-slate-800 rounded hover:bg-gray-400 hover:text-black">
+                </div>
+                {{-- Tombol Filter untuk sm/md --}}
+                <div class="flex lg:hidden mb-1 w-44 mt-1">
+                    <button @click="openFilter = !openFilter"
+                            class="w-full px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                        <span x-show="!openFilter">Filter Data</span>
+                        <span x-show="openFilter">Tutup Filter</span>
+                    </button>
+                </div>
+                @if(request('search') || request('role') || request('komplek'))
+                    <a href="{{ route('pengguna.index') }}">
+                        <div class="w-30 text-center px-4 py-2 bg-gray-300 text-slate-800 rounded hover:bg-gray-400 hover:text-black">
                             Reset
-                        </a>
-                    @endif
-                    <select name="role" id="role" class="text-gray-600 py-2 lg:w-44 w-36 h-10 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600">
+                        </div>
+                    </a>
+                @endif 
+                <form method="GET" action="{{ route('pengguna.index') }}" 
+                class="flex-col space-y-2 md:space-y-0 md:flex-row md:flex lg:flex lg:flex-row lg:space-y-0 lg:space-x-2 w-full"
+                :class="{ 'hidden': !openFilter }" 
+                x-show="openFilter || window.innerWidth >= 1024" 
+                x-transition>
+                    <select name="role" id="role" class="text-gray-600 py-2 lg:w-44 w-full h-10 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600">
                         <option value="">Pilih Role</option>
                         <option value="Petugas Lapangan" {{ request('role') === 'Petugas Lapangan' ? 'selected' : '' }}>Petugas Lapangan</option>
                         <option value="Pengurus" {{ request('role') === 'Pengurus' ? 'selected' : '' }}>Pengurus</option>
                         <option value="Pelanggan" {{ request('role') === 'Pelanggan' ? 'selected' : '' }}>Pelanggan</option>
                         <option value="Mitra Pembayaran" {{ request('role') === 'Mitra Pembayaran' ? 'selected' : '' }}>Mitra Pembayaran</option>
                     </select>
-                    <select name="komplek" id="komplek" class="text-gray-600 py-2 lg:w-56 w-36 h-10 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600">
+                    <select name="komplek" id="komplek" class="text-gray-600 py-2 lg:w-56 w-full h-10 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600">
                         <option value="">Pilih Komplek</option>
                         <option value="Desa dan Delod Desa" {{ request('komplek') === 'Desa dan Delod Desa' ? 'selected' : '' }}>Desa dan Delod Desa</option>
                         <option value="Desa Anyar" {{ request('komplek') === 'Desa Anyar' ? 'selected' : '' }}>Desa Anyar</option>
@@ -75,7 +90,7 @@
                         <option value="Banjar Bunut" {{ request('komplek') === 'Banjar Bunut' ? 'selected' : '' }}>Banjar Bunut</option>
                     </select>
                     <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Cari Data" class="w-36 md:w-80 py-1.5 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 placeholder:text-sm">
+                        placeholder="Cari Data" class="w-full md:w-80 py-1.5 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 placeholder:text-sm">
                     <button type="submit" class="ml-4 px-4 py-2 bg-blue-500 text-white hover:bg-blue-300 rounded-xl hover:outline-blue-700 hover:outline-2">
                         Cari
                     </button>
@@ -123,7 +138,7 @@
                         <label for="password" class="block ml-2 mb-2 font-semibold text-slate-700">Password</label>
                         <input type="password" x-ref="password" name="password" placeholder="Masukan Password" id="password" class="py-1.5 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 placeholder:text-sm" required>
                     </div>
-                    <div>
+                    <div> 
                         <button type="submit" 
                             class="group flex items-center border border-sky-600 px-4 py-2 rounded-2xl bg-sky-300 hover:bg-sky-700 hover:text-white cursor-pointer ml-6"
                             :disabled="isLoading"
