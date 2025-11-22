@@ -91,6 +91,9 @@ class LaporanController extends Controller
         $penggunaanAir = PenggunaanAir::with(['penggunas', 'pembayarans'])
             ->where('periode_bulan', $request->bulan_laporan)
             ->where('periode_tahun', $request->tahun_laporan)
+            ->whereHas('penggunas', function ($q) {
+                $q->where('role', 'Pelanggan');
+            })
             ->get();
 
         if ($penggunaanAir->isEmpty()) {
