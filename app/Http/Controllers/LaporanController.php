@@ -162,11 +162,20 @@ class LaporanController extends Controller
         $dompdf->render();
 
         // Simpan PDF ke storage
+        // Nama file
         $filename = 'laporan_' . $request->bulan_laporan . '_' . $request->tahun_laporan . '.pdf';
-        $path = storage_path('app/public/laporans/' . $filename);
-        file_put_contents($path, $dompdf->output());
 
-        $laporan->update(['file_pdf_path' => 'laporans/' . $filename]);
+        // Path dalam disk
+        $pathInDisk = 'laporans/' . $filename;
+
+        // Simpan PDF ke disk default_public_disk
+        Storage::disk(config('filesystems.default_public_disk'))
+                ->put($pathInDisk, $dompdf->output());
+
+        // Update database
+        $laporan->update([
+            'file_pdf_path' => $pathInDisk
+        ]);
 
         return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dibuat, silahkan lihat hasil laporan');
     }
@@ -180,11 +189,14 @@ class LaporanController extends Controller
         $laporan = Laporan::where('id', $id)->first();
 
         // Ambil path PDF dari storage
-        $path = storage_path('app/public/' . $laporan->file_pdf_path);
+        $disk = Storage::disk(config('filesystems.default_public_disk'));
 
-        if (!file_exists($path)) {
+        if (! $disk->exists($laporan->file_pdf_path)) {
             abort(404, 'File laporan tidak ditemukan');
         }
+
+        //Ambil path full
+        $path = $disk->path($laporan->file_pdf_path);
 
         // Bisa langsung stream ke browser
         return response()->file($path);
@@ -193,18 +205,18 @@ class LaporanController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        //
-    }
+    // public function edit(string $id)
+    // {
+    //     //
+    // }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    // public function update(Request $request, string $id)
+    // {
+    //     //
+    // }
 
     /**
      * Remove the specified resource from storage.
@@ -215,9 +227,9 @@ class LaporanController extends Controller
         $laporan = Laporan::findOrFail($id);
 
         // Pastikan file PDF-nya ada
-        if ($laporan->file_pdf_path && Storage::disk('public')->exists($laporan->file_pdf_path)) {
+        if ($laporan->file_pdf_path && Storage::disk(config('filesystems.default_public_disk'))->exists($laporan->file_pdf_path)) {
             // Hapus file PDF dari storage
-            Storage::disk('public')->delete($laporan->file_pdf_path);
+            Storage::disk(config('filesystems.default_public_disk'))->delete($laporan->file_pdf_path);
         }
 
         // Hapus record dari database

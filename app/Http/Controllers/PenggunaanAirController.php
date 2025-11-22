@@ -298,7 +298,7 @@ class PenggunaanAirController extends Controller
             'kredit_account_id' => $akunPiutang->id,
             'nominal' => $nominal
         ]);
-
+ 
         //Hapus foto meteran kalau ada
         if($penggunaanAir->foto_meter && Storage::disk(config('filesystems.default_public_disk'))->exists($penggunaanAir->foto_meter)){
             Storage::disk(config('filesystems.default_public_disk'))->delete($penggunaanAir->foto_meter);
