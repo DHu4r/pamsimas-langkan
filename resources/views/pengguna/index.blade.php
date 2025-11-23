@@ -107,7 +107,9 @@
                 <div class="flex flex-wrap items-center gap-4">
                     <div>
                         <label for="nama" class="block ml-2 mb-2 font-semibold text-slate-700">Nama</label>
-                        <input type="text" id="nama" x-ref="nama" name="nama" x-model="formData.nama" placeholder="Masukan nama pengguna" class="py-1.5 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 placeholder:text-sm" required>
+                        <input type="text" id="nama" x-ref="nama" name="nama" x-model="formData.nama" placeholder="Masukan nama pengguna" class="py-1.5 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 placeholder:text-sm"
+                        required
+                        >
                     </div>
                     <div>
                         <label for="role" class="block ml-2 mb-2 font-semibold text-slate-700">Role</label>
@@ -136,7 +138,9 @@
                     </div>
                     <div>
                         <label for="password" class="block ml-2 mb-2 font-semibold text-slate-700">Password</label>
-                        <input type="password" x-ref="password" name="password" placeholder="Masukan Password" id="password" class="py-1.5 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 placeholder:text-sm" required>
+                        <input type="password" x-ref="password" name="password" placeholder="Masukan Password" id="password" class="py-1.5 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 placeholder:text-sm"
+                        :required="formMode === 'tambah'"                        
+                        >
                     </div>
                     <div> 
                         <button type="submit" 
