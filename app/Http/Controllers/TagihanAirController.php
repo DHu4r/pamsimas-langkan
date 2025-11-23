@@ -46,7 +46,7 @@ class TagihanAirController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('konsumsi', 'like', '%' . $search . '%')
-                  ->orWhereRaw("CONCAT(tanggal_catat, '-', bulan, '-', tahun) LIKE ?", ["%$search%"])
+                  ->orWhereRaw("CONCAT(tanggal_catat, '-', periode_bulan, '-', periode_tahun) LIKE ?", ["%$search%"])
                   ->orWhere('meter_baca_awal', 'like', '%' . $search . '%')
                   ->orWhere('meter_baca_akhir', 'like', '%' . $search . '%')
                   ->orWhereHas('penggunas', function ($q2) use ($search) {

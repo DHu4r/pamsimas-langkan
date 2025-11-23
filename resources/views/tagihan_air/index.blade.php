@@ -142,7 +142,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">
+                            <td colspan="7" class="text-center">
                                 <h1 class="p-4 outline-1 outline-red-600 bg-red-300 ">Data tidak ditemukan</h1>
                             </td>
                         </tr>
