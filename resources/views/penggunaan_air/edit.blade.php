@@ -30,7 +30,7 @@
                 </div>
                 <div class="w-full lg:w-5/12 mt-4">
                     <label for="konsumsi" class="block ml-2 mb-2 font-semibold text-slate-700">Penggunaan Air (Meter Kubik)</label>
-                    <input type="number" name="konsumsi" value="{{ $penggunaan_air->konsumsi }}"
+                    <input type="number" name="konsumsi" value="{{ $penggunaan_air->konsumsi }}" x-model="konsumsi"
                     class="w-full py-1.5 ps-2 ml-2 border border-slate-400 rounded-xl bg-slate-200 focus:outline-0" readonly>
                 </div>
                 <div class="w-full lg:w-5/12 mt-4">

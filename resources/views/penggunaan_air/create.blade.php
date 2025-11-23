@@ -81,7 +81,7 @@
                 <div class="w-full lg:w-5/12 mt-4">    
                     <label for="meter_baca_akhir" class="block ml-2 mb-2 font-semibold text-slate-700">Nilai Meteran Akhir</label>
                     <input required type="number" x-model="meterAkhir" @input="hitungKonsumsi" name="meter_baca_akhir" id="meter_baca_akhir" class="w-full ml-2 ps-2 text-sm text-slate-700 py-2 px-4 border border-slate-400 rounded-xl focus:outline-sky-600" placeholder="Masukan Nilai Meteran Akhir">
-                </div>
+                </div> 
                 <div class="w-full lg:w-5/12 mt-4">
                     <label for="konsumsi" class="block ml-2 mb-2 font-semibold text-slate-700">Penggunaan Air (Meter Kubik)</label>
                     <input type="number" name="konsumsi" placeholder="Penggunaan Air"
