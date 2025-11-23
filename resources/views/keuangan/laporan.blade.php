@@ -34,7 +34,9 @@
 
         <h1 class="font-semibold mb-2">Daftar Laporan</h1>
         <div>
-            <div class="flex w-full justify-between mb-4">
+            <div 
+            x-data="{ openFilter: {{ request('search') || request('periode_bulan') || request('periode_tahun') ? 'true' : 'false' }} }"
+            class="flex flex-col lg:flex-row w-full justify-between mb-4 space-x-1 space-y-1">
                 <div>
                     <button  @click="tambahLaporan()"
                         class="group flex px-4 py-2 rounded transition-all duration-300"
@@ -53,14 +55,28 @@
                         <h3 class="font-semibold group-hover:text-slate-800" x-text="showForm ? 'Batal' : 'Tambah'"></h3>
                     </button>
                 </div>
+
+                {{-- Tombol Filter untuk sm/md --}}
+                <div class="flex lg:hidden mb-1 w-44 mt-1">
+                    <button @click="openFilter = !openFilter"
+                            class="w-full px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                        <span x-show="!openFilter">Filter Data</span>
+                        <span x-show="openFilter">Tutup Filter</span>
+                    </button>
+                </div>
+                @if(request('search') || request('periode_bulan') || request('periode_tahun'))
+                    <a href="{{ route('laporan.index') }}"
+                        class="px-4 py-2 bg-gray-300 text-slate-800 rounded hover:bg-gray-400 hover:text-black">
+                        Reset
+                    </a>
+                @endif
+
                 {{-- Pembungkus tombol cari dan tambah --}}
-                <form method="GET" action="{{ route('laporan.index') }}" class="flex mb-4">
-                    @if(request('search') || request('periode_bulan') || request('periode_tahun'))
-                        <a href="{{ route('laporan.index') }}"
-                            class="px-4 py-2 bg-gray-300 text-slate-800 rounded hover:bg-gray-400 hover:text-black">
-                            Reset
-                        </a>
-                    @endif
+                <form method="GET" action="{{ route('laporan.index') }}" 
+                class="flex-col space-y-2 md:space-y-0 md:flex-row md:flex lg:flex lg:flex-row lg:space-y-0 lg:space-x-2 w-full"
+                :class="{ 'hidden': !openFilter }" 
+                x-show="openFilter || window.innerWidth >= 1024" 
+                x-transition>
                     <select name="periode_bulan" id="periode_bulan" class="text-gray-600 py-2 w-full lg:w-44 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 text-sm">
                         <option value="">Pilih Periode Bulan</option>
                         <option value=1 {{ request('periode_bulan') == 1 ? 'selected' : '' }}>Januari</option>
@@ -136,7 +152,7 @@
             </form>
         </div>
 
-        <div class="hidden lg:block md:table w-full p-4 text-base text-slate-700 mt-5">
+        <div class="lg:block md:table w-full p-4 text-base text-slate-700 mt-5">
             <table class="w-full p-4">
                 <thead class="border-b border-gray-300">
                     <tr>

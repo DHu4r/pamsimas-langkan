@@ -48,7 +48,7 @@
                             <svg x-show="showForm" class="group-hover:text-gray-800 w-6 h-6 text-white mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                             </svg>                      
-                        <h3 class="font-semibold group-hover:text-slate-800" x-text="showForm ? 'Batal' : 'Tambah'"></h3>
+                        <h3 class="font-semibold group-hover:text-slate-800" x-text="showForm ? 'Batal' : 'Tambah Akun'"></h3>
                     </button>
                 </div> 
                 {{-- Pembungkus tombol cari dan tambah --}}
@@ -121,7 +121,7 @@
 
         </div>
         {{-- Tampilan Halaman Dekstop --}}
-        <div class="hidden lg:block md:table w-full p-4 text-base text-slate-700 mt-5">
+        <div class="lg:block md:table w-full p-4 text-base text-slate-700 mt-5">
             <table class="w-full p-4">
                 <thead class="border-b border-gray-300">
                     <tr class="">
