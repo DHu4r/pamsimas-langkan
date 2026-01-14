@@ -18,7 +18,13 @@
                 @csrf
                 <div class="block mx-10 mt-6">
                     <label for="no_hp" class="font-semibold text-gray-800">No. Handpone</label>
-                    <input type="text" name="no_hp" class="min-w-full text-sm text-gray-600 border-1 border-slate-400 py-2 px-1.5 my-1.5 rounded-md focus:outline-amber-300" placeholder="Masukan nomor hp anda" required>
+                    <input type="text" name="no_hp"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                        class="min-w-full text-sm text-gray-600 border-1 border-slate-400 py-2 px-1.5 my-1.5 rounded-md focus:outline-amber-300"
+                        placeholder="Masukan nomor hp anda"
+                        required>
                     <label for="password" class="font-semibold text-gray-800">Password</label>
                     <input type="password" name="password" class="min-w-full text-sm text-gray-600 border-1 border-slate-400 py-2 px-1.5 my-1.5 rounded-md focus:outline-amber-300" placeholder="Masukan password anda" required>
                     @if ($errors->has('login'))
