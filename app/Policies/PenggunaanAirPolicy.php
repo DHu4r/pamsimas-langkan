@@ -41,15 +41,14 @@ class PenggunaanAirPolicy
      */
     public function update(Pengguna $pengguna, PenggunaanAir $penggunaanAir): bool
     {
-        return in_array($pengguna->role, ['Pengurus', 'Petugas Lapangan']);
+        return !$penggunaanAir->sudah_bayar
+            && in_array($pengguna->role, ['Pengurus', 'Petugas Lapangan']);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(Pengguna $pengguna, PenggunaanAir $penggunaanAir): bool
     {
-        return in_array($pengguna->role, ['Pengurus', 'Petugas Lapangan']);
+        return !$penggunaanAir->sudah_bayar
+            && in_array($pengguna->role, ['Pengurus', 'Petugas Lapangan']);
     }
 
     /**
