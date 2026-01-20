@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+
 
 class PenggunaanAirController extends Controller
 {
@@ -105,7 +108,7 @@ class PenggunaanAirController extends Controller
             'konsumsi' => 'required|integer',
             'tanggal_catat' => 'required',
             'periode_tahun' => 'required|integer|min:1900|max:2100',
-            'foto_meter'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto_meter'        => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
             'periode_bulan' => [
                 'required',
                 'integer',
@@ -122,6 +125,9 @@ class PenggunaanAirController extends Controller
             // Di sinilah messages() diletakkan (parameter ke-2)
             'meter_baca_akhir.gte' => 'Nilai meteran akhir tidak boleh lebih sedikit dari nilai meteran awal.',
             'periode_bulan.unique' => 'Data untuk bulan dan tahun ini sudah ada untuk pelanggan ini.',
+            'foto_meter.max'   => 'Ukuran foto maksimal 10 MB. Silakan ambil foto ulang atau gunakan resolusi lebih kecil.',
+            'foto_meter.image' => 'File yang diunggah harus berupa gambar.',
+            'foto_meter.mimes' => 'Format foto harus JPG atau PNG.',
         ]);
 
         //Validasi tanggal sesuai periode
@@ -150,11 +156,44 @@ class PenggunaanAirController extends Controller
             }
         }
 
-        //Upload Foto
-        if ($request->hasFile('foto_meter')) {
-            // simpan ke storage/app/public/meteran
-            $filename = time().'_'.$request->file('foto_meter')->getClientOriginalName();
-            $path = $request->file('foto_meter')->storeAs('meteran', $filename, config('filesystems.default_public_disk'));
+        // //Upload Foto
+        // if ($request->hasFile('foto_meter')) {
+        //     // simpan ke storage/app/public/meteran
+        //     $filename = time().'_'.$request->file('foto_meter')->getClientOriginalName();
+        //     $path = $request->file('foto_meter')->storeAs('meteran', $filename, config('filesystems.default_public_disk'));
+        //     $validated['foto_meter'] = $path;
+        // }
+
+        //Upload foto + compress
+        if($request->hasFile('foto_meter')){
+            $file = $request->file('foto_meter');
+
+            //nama file
+            $filename = time().'_'.$file->getClientOriginalName();
+
+            // Manager v3 (GD driver)
+            $manager = new ImageManager(new Driver());
+
+            // Baca image
+            $image = $manager->read($file->getRealPath());
+
+            //Resize proporsiojnal (max width 1280)
+            $image->scaleDown(1280);
+
+            //Simpan sementara
+            $tempPath = sys_get_temp_dir() . '/' . $filename;
+
+            //compress kualitas ke 75%
+            $image->save($tempPath, quality: 75);
+
+            //Upload file hasil compress ke disk
+            $path  = Storage::disk(config('filesystems.default_public_disk'))
+                ->putFileAs('meteran', new \Illuminate\Http\File($tempPath), $filename);
+
+            //Hapus file sementara
+            @unlink($tempPath);
+
+            //simpan path ke DB
             $validated['foto_meter'] = $path;
         }
       
