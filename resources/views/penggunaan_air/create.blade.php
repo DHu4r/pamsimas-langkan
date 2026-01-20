@@ -128,10 +128,85 @@
                     <label for="periode_tahun" class="block ml-2 mb-2 font-semibold text-slate-700">Periode Tahun</label>
                     <input required type="number" name="periode_tahun" id="periode_tahun" value="{{ now()->format("Y") }}" class="w-full ml-2 ps-2 text-sm text-slate-700 py-2 px-4 border border-slate-400 rounded-xl focus:outline-sky-600" placeholder="Masukan Tahun">
                 </div>
-                <div class="w-full lg:w-5/12 mt-4" x-data="{ preview: null, fileInput: null }">
+                <div class="w-full lg:w-5/12 mt-4"
+                    x-data="{
+                        preview: null,
+                        fileInput: null,
+
+                        async handleFile(e) {
+                            const file = e.target.files[0];
+                            if (!file) {
+                                this.preview = null;
+                                this.fileInput = null;
+                                return;
+                            }
+
+                            // Preview tetap dari file asli dulu
+                            this.preview = URL.createObjectURL(file);
+
+                            // Kalau sudah < 1.8MB, kirim apa adanya
+                            if (file.size <= 1800 * 1024) {
+                                this.fileInput = file;
+                                return;
+                            }
+
+                            // Compress image
+                            const compressed = await this.compressImage(file);
+
+                            this.fileInput = compressed;
+
+                            // Replace file di input supaya Laravel terima file hasil compress
+                            const dt = new DataTransfer();
+                            dt.items.add(compressed);
+                            this.$refs.fileInput.files = dt.files;
+
+                            // Update preview ke hasil compress
+                            this.preview = URL.createObjectURL(compressed);
+                        },
+
+                        compressImage(file) {
+                            return new Promise((resolve) => {
+                                const img = new Image();
+                                const reader = new FileReader();
+
+                                reader.onload = (e) => {
+                                    img.src = e.target.result;
+                                };
+
+                                img.onload = () => {
+                                    const canvas = document.createElement('canvas');
+                                    const ctx = canvas.getContext('2d');
+
+                                    const maxWidth = 1600;
+                                    const scale = Math.min(1, maxWidth / img.width);
+
+                                    canvas.width = img.width * scale;
+                                    canvas.height = img.height * scale;
+
+                                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                                    canvas.toBlob(
+                                        (blob) => {
+                                            const newFile = new File([blob], file.name, {
+                                                type: 'image/jpeg',
+                                                lastModified: Date.now()
+                                            });
+                                            resolve(newFile);
+                                        },
+                                        'image/jpeg',
+                                        0.75 // quality: 0.6–0.8
+                                    );
+                                };
+
+                                reader.readAsDataURL(file);
+                            });
+                        }
+                    }">
+
                     <label for="foto_meter" class="block ml-2 mb-2 font-semibold text-slate-700">
                         Foto Meteran Air
                     </label>
+
                     <input 
                         required
                         type="file" 
@@ -140,15 +215,7 @@
                         accept="image/*" 
                         capture="environment"
                         x-ref="fileInput"
-                        @change="
-                            if ($event.target.files.length) {
-                                preview = URL.createObjectURL($event.target.files[0]);
-                                fileInput = $event.target.files[0];
-                            } else {
-                                preview = null;
-                                fileInput = null;
-                            }
-                        "
+                        @change="handleFile($event)"
                         class="w-full ml-2 ps-2 text-sm text-slate-700 py-2 px-4 border border-slate-400 rounded-xl focus:outline-sky-600"
                     >
 
@@ -168,7 +235,8 @@
                             </button>
                         </div>
                     </template>
-                </div> 
+                </div>
+
                 <div class="flex w-full justify-center">
                     <button 
                     type="submit"
