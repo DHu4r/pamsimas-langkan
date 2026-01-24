@@ -65,7 +65,7 @@
             @endif
         </p>
         @if ($penggunaanAir->pembayarans->metode === 'transfer')
-            <p><strong>Metode Pembayaran : </strong> {{ $penggunaanAir->pembayarans->metode }} dari Rekening {{ $penggunaanAir->pembayarans->nama_bank }} a/n {{ $penggunaanAir->pembayarans->nama_rekening }} </p>
+            <p><strong>Metode Pembayaran : </strong> {{ $penggunaanAir->pembayarans->metode }} dari Rekening {{ $penggunaanAir->pembayarans->nama_bank }} ({{ $penggunaanAir->pembayarans->no_rekening }}) a/n {{ $penggunaanAir->pembayarans->nama_rekening }} </p>
         @else
             <p><strong>Metode Pembayaran : </strong> {{ $penggunaanAir->pembayarans->metode }} di Pengurus a/n {{ $penggunaanAir->pembayarans->dibayarOleh->nama }} </p>
         @endif

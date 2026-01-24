@@ -67,7 +67,7 @@
                                 <p class="w-6/12">{{ $pembayaran->metode }} di <span class="font-semibold">Pengurus</span> a/n <span class="font-semibold">{{ $pembayaran->dibayarOleh->nama }} </span></p>
                             @elseif ($pembayaran->metode === 'transfer')
                                 @if ($pembayaran->dibayarOleh->role === "Pelanggan")
-                                    <p class="w-6/12">{{ $pembayaran->metode }} dari Rekening <span class="font-semibold">{{ $pembayaran->nama_bank }}</span> a/n <span class="font-semibold">{{ $pembayaran->nama_rekening }}</span></p>
+                                    <p class="w-6/12">{{ $pembayaran->metode }} dari Rekening <span class="font-semibold">{{ $pembayaran->nama_bank }} ({{ $pembayaran->no_rekening }})</span> a/n <span class="font-semibold">{{ $pembayaran->nama_rekening }}</span></p>
                                 @else
                                     <p class="w-6/12">{{ $pembayaran->metode }} dari Rekening <span class="font-semibold">{{ $pembayaran->nama_bank }}</span> a/n <span class="font-semibold">{{ $pembayaran->nama_rekening }}</span> melalui mitra a/n <span class="font-semibold">{{ $pembayaran->dibayarOleh->nama }}</span></p>
                                 @endif
