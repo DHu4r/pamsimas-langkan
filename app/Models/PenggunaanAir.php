@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\PenggunaanAirApproved;
 use App\Traits\TanggalIndo;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,10 @@ class PenggunaanAir extends Model
         'periode_tahun',
         'sudah_bayar',
         'foto_meter',
+        'status',
+        'approved_by',
+        'approved_at',
+        'catatan_verifikasi',
     ];
 
     public function penggunas(){
@@ -42,7 +47,13 @@ class PenggunaanAir extends Model
         static::created(function ($penggunaanAir) {
             event(new \App\Events\PenggunaanAirCreated($penggunaanAir));
         });
-        
+
+        static::updated(function ($penggunaanAir) {
+            if ($penggunaanAir->wasChanged('status') && $penggunaanAir->status === 'approved') {
+                event(new PenggunaanAirApproved($penggunaanAir));
+            }
+        });
+                
         static::creating(function ($model) {
             $model->konsumsi = max(0, $model->meter_baca_akhir - $model->meter_baca_awal);
         });

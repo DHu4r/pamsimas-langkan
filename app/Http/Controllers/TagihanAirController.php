@@ -16,6 +16,7 @@ class TagihanAirController extends Controller
         $user = Auth::user();
 
         $query = PenggunaanAir::with('penggunas')
+        ->where('status', 'approved') 
         ->orderByDesc('tahun')
         ->orderByDesc('bulan')
         ->orderByDesc('tahun');

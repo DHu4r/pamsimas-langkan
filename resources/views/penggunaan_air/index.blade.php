@@ -18,7 +18,7 @@
         @endif
         {{-- Pembungkus tombol cari dan tambah --}}
         <div 
-        x-data="{ openFilter: {{ (request('periode_bulan') || request('periode_tahun') || request('search') || request()->has('status_bayar')) ? 'true' : 'false' }} }"
+        x-data="{ openFilter: {{ (request('periode_bulan') || request('periode_tahun') || request('search') || request()->has('status_bayar')) || request()->has('status_input') ? 'true' : 'false' }} }"
         class="flex flex-col lg:flex-row w-full justify-between mb-4">
             @auth
                 @if (in_array(Auth::user()->role, ['Petugas Lapangan', 'Pelanggan']))
@@ -51,7 +51,7 @@
                 :class="{ 'hidden': !openFilter }" 
                 x-show="openFilter || window.innerWidth >= 1024" 
                 x-transition>
-                @if(request('periode_bulan') || request('periode_tahun') || request('search') || request('status_bayar') !== null)
+                @if(request('periode_bulan') || request('periode_tahun') || request('search') || request('status_bayar') || request('status_input') !== null)
                     <a href="{{ route('penggunaan_air.index') }}"
                         class="px-4 py-2 bg-gray-300 text-slate-800 rounded hover:bg-gray-400 hover:text-black">
                         Reset
@@ -61,6 +61,12 @@
                     <option value="" {{ request('status_bayar') === null ? 'selected' : '' }}>Status Bayar</option>
                     <option value="0" {{ request('status_bayar') === '0' ? 'selected' : '' }}>Belum Lunas</option>
                     <option value="1" {{ request('status_bayar') === '1' ? 'selected' : '' }}>Lunas</option>
+                </select>
+                <select name="status_input" id="status_input" class="text-gray-600 w-full lg:w-36 py-2 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 text-sm">
+                    <option value="" {{ request('status_input') === null ? 'selected' : '' }}>Status Input</option>
+                    <option value="approved" {{ request('status_input') === 'approved' ? 'selected' : '' }}>Terverifikasi</option>
+                    <option value="pending" {{ request('status_input') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="rejected" {{ request('status_input') === 'rejected' ? 'selected' : '' }}>Ditolak</option>
                 </select>
                 <select name="periode_bulan" id="periode_bulan" class="text-gray-600 py-2 w-full lg:w-44 ps-2 ml-2 border border-slate-400 rounded-xl focus:outline-sky-600 text-sm">
                     <option value="">Pilih Periode Bulan</option>
@@ -95,6 +101,7 @@
                         <th class="text-start px-4 py-2">Konsumsi</th>
                         <th class="text-start px-4 py-2">Tanggal Catat</th>
                         <th class="text-start px-4 py-2">Periode</th>
+                        <th class="text-start px-4 py-2">Status</th>
                         <th class="text-center px-4 py-2">Aksi</th>
                     </tr>
                 </thead>
@@ -106,6 +113,15 @@
                             <td class="text-start px-4 py-1">{{ $penggunaan_air->konsumsi }} m<sup>3</sup></td>
                             <td class="text-start px-4 py-1">{{ $penggunaan_air->tanggal_catat_indo }}</td>
                             <td class="text-start px-4 py-1">{{ $penggunaan_air->nama_bulan }} {{ $penggunaan_air->periode_tahun }}</td>
+                            <td class="text-start px-4 py-1">
+                                @if ($penggunaan_air->status === 'pending')
+                                    <span class="w-3/12 text-center px-2 py-1 rounded-full md:text-sm lg:text-sm  text-xs font-medium bg-red-200 outline-1 outline-red-700 text-red-900">belum verifikasi</span>
+                                @elseif ($penggunaan_air->status === 'rejected')
+                                    <span class="w-3/12 text-center px-2 py-1 rounded-full md:text-sm lg:text-sm  text-xs font-medium bg-red-200 outline-1 outline-red-700 text-red-900">ditolak</span>
+                                @else
+                                    <span class="w-3/12 text-center px-2 py-1 rounded-full md:text-sm lg:text-sm  text-xs font-medium bg-green-200 outline-1 outline-green-700 text-green-900">terverifikasi</span>
+                                @endif
+                            </td>
                             <td class="text-center px-4 py-1">
                                 <button 
                                     x-data 

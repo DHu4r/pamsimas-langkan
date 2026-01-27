@@ -46,6 +46,7 @@ Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('index.p
 //Data API Meteran awal pelanggan
 Route::get('api/meter-terakhir/{penggunaID}', function ($penggunaId){
     $lastMeter = \App\Models\PenggunaanAir::where('penggunas_id', $penggunaId)
+        ->where('status', 'approved')
         ->orderByDesc('tanggal_catat')
         ->orderByDesc('bulan')
         ->orderByDesc('tahun')

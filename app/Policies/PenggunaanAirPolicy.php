@@ -42,6 +42,7 @@ class PenggunaanAirPolicy
     public function update(Pengguna $pengguna, PenggunaanAir $penggunaanAir): bool
     {
         return !$penggunaanAir->sudah_bayar
+            && $penggunaanAir->status !== 'rejected'
             && in_array($pengguna->role, ['Pengurus', 'Petugas Lapangan']);
     }
 

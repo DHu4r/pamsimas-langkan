@@ -45,6 +45,11 @@ class PenggunaanAirController extends Controller
             $query->where('sudah_bayar', $request->status_bayar);
         }
 
+        //Filter status input
+        if ($request->filled('status_input')) {
+            $query->where('status', $request->status_input);
+        }
+
         //filter periode bulan
         if($request->filled('periode_bulan')){
             $query->where('periode_bulan', $request->periode_bulan);
@@ -101,6 +106,18 @@ class PenggunaanAirController extends Controller
     {
         $pencatat = Auth::user();
 
+        // Tentukan status berdasarkan role pencatat
+        $status = 'pending';
+        $approvedBy = null;
+        $approvedAt = null;
+
+        if (in_array($pencatat->role, ['Pengurus', 'Petugas Lapangan'])) {
+            $status = 'approved';
+            $approvedBy = $pencatat->id;
+            $approvedAt = now();
+        }
+
+
         $validated = $request->validate([
             'penggunas_id' => 'required|uuid|exists:penggunas,id',
             'meter_baca_awal' => 'required|integer|min:0',
@@ -118,7 +135,8 @@ class PenggunaanAirController extends Controller
                     return $query
                     ->where('penggunas_id', $request->penggunas_id)
                     ->where('periode_bulan', $request->periode_bulan)
-                    ->where('periode_tahun', $request->periode_tahun);
+                    ->where('periode_tahun', $request->periode_tahun)
+                    ->whereIn('status', ['pending', 'approved']);
                 }),
             ],
         ],[
@@ -208,7 +226,11 @@ class PenggunaanAirController extends Controller
             'periode_tahun'  => $validated['periode_tahun'],
             'sudah_bayar'    => false,
             'foto_meter'     => $validated['foto_meter'] ?? null, // ← simpan path foto
-            'dicatat_oleh' => $pencatat->id
+            'dicatat_oleh' => $pencatat->id,
+            // FIELD BARU
+            'status'         => $status,
+            'approved_by'    => $approvedBy,
+            'approved_at'    => $approvedAt,
         ]);
 
         return redirect()->route('penggunaan_air.index')->with('success', 'Data penggunaan berhasil disimpan.');
