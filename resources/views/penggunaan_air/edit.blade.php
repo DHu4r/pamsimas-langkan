@@ -64,7 +64,7 @@
                     <label for="periode_tahun" class="block ml-2 mb-2 font-semibold text-slate-700">Periode Tahun</label>
                     <input required type="number" name="periode_tahun" id="periode_tahun" class="w-full ml-2 ps-2 text-sm text-slate-700 py-2 px-4 border border-slate-400 rounded-xl focus:outline-sky-600" value="{{ $penggunaan_air->periode_tahun }}">
                 </div>
-                <div class="w-full lg:w-5/12 mt-4" x-data="{ preview: null, fileInput: null }">
+                <div class="w-full lg:w-5/12 mt-4" x-data="{preview: {{ $penggunaan_air->foto_meter ? "'/storage/".$penggunaan_air->foto_meter."'" : 'null' }}, fileInput: null}">
                     <label for="foto_meter" class="block ml-2 mb-2 font-semibold text-slate-700">
                         Foto Meteran Air
                     </label>

@@ -309,8 +309,10 @@ class PenggunaanAirController extends Controller
             $filename = time().'_'.$request->file('foto_meter')->getClientOriginalName();
             $path = $request->file('foto_meter')->storeAs('meteran', $filename, config('filesystems.default_public_disk'));
             $validated['foto_meter'] = $path;
+        }else {
+        unset($validated['foto_meter']);
         }
-
+        
         // === Update Data ===
         // kita buat array data yang akan diupdate tanpa menimpa foto jika tidak ada upload baru
         $dataUpdate = [
